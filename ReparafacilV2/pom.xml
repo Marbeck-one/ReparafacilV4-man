@@ -5,15 +5,16 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.0</version> <relativePath/> 
+		<version>3.2.11</version>
+		<relativePath/>
 	</parent>
 	<groupId>com.Reparafacil</groupId>
 	<artifactId>ReparafacilV2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ReparafacilV2</name>
-	<description>Proyecto ReparaFácil SPA V2</description>
+	<description>Proyecto ReparaFacil SPA V2</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 
@@ -80,19 +81,15 @@
 			<scope>runtime</scope>
 		</dependency>
 
-	</dependencies> <build>
+	</dependencies>
+
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<release>21</release>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
+					<release>17</release>
 				</configuration>
 			</plugin>
 			<plugin>
