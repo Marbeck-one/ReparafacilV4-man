@@ -47,6 +47,16 @@ public class DataSeeder {
                 System.out.println("--> Usuario TECNICO (Login) creado: tecnico1 / 123456");
             }
 
+            // Crear USUARIO CLIENTE (Login) - NUEVO
+            if (userRepo.findByUsername("cliente1").isEmpty()) {
+                Usuario userCliente = new Usuario();
+                userCliente.setUsername("cliente1");
+                userCliente.setPassword(encoder.encode("123456"));
+                userCliente.setRol(Rol.CLIENTE);
+                userRepo.save(userCliente);
+                System.out.println("--> Usuario CLIENTE (Login) creado: cliente1 / 123456");
+            }
+
             // ==========================================
             // 2. PERFILES PÚBLICOS (CATÁLOGOS)
             // ==========================================
