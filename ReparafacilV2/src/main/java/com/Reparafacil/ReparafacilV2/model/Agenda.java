@@ -2,22 +2,23 @@ package com.Reparafacil.ReparafacilV2.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor; // <--- AGREGADO
 import lombok.Data;
+import lombok.NoArgsConstructor;  // <--- AGREGADO
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "agenda")
 @Data
+@NoArgsConstructor  // <--- NECESARIO PARA JSON
+@AllArgsConstructor // <--- RECOMENDADO
 public class Agenda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- CORRECCIÓN IMPORTANTE ---
-    // Quitamos "cliente" y "tecnico" del JsonIgnoreProperties.
-    // Esto permite que cuando envíes el JSON, el backend lea a quién pertenece el servicio.
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
     @JoinColumn(name = "servicio_id")
     @JsonIgnoreProperties({"agenda", "garantia", "hibernateLazyInitializer", "handler"}) 

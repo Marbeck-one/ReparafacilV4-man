@@ -3,13 +3,17 @@ package com.Reparafacil.ReparafacilV2.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor; // <--- AGREGADO
 import lombok.Data;
+import lombok.NoArgsConstructor;  // <--- AGREGADO
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "servicios")
 @Data
+@NoArgsConstructor  // <--- NECESARIO PARA JSON
+@AllArgsConstructor // <--- RECOMENDADO
 public class Servicio {
 
     @Id
