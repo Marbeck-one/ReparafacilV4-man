@@ -147,7 +147,13 @@ public class DataSeeder {
                        servicioAgenda.setEstado(EstadoServicio.ASIGNADO);
                        servicioAgenda.setCliente(cliente);
                        servicioAgenda.setTecnico(tecnico);
-                       servicioRepo.save(servicioAgenda);
+                       
+                       // ====================================================================================
+                       // IMPORTANTE: COMENTAMOS ESTA LÍNEA PARA EVITAR "detached entity passed to persist"
+                       // Al no guardar manualmente aquí, Hibernate guardará el servicio automáticamente 
+                       // cuando guardemos la Agenda, gracias al CascadeType.ALL en la entidad Agenda.
+                       // ====================================================================================
+                       // servicioRepo.save(servicioAgenda); 
 
                        // 2. Crear Agenda (La Cita)
                        Agenda cita = new Agenda();
