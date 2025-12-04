@@ -33,15 +33,22 @@ public class Tecnico {
     private String telefono;
 
     @NotBlank(message = "La especialidad es obligatoria")
-    private String especialidad; // E.g., "Refrigeración", "Electrónica"
+    private String especialidad;
 
     private boolean disponible = true;
 
+    // Campo para la foto (URL)
+    @Column(length = 500)
+    private String foto;
+
+    // --- CORRECCIÓN DE LISTAS ---
+
     @OneToMany(mappedBy = "tecnico", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("tecnico")
+    // Al pedir un técnico, no traemos todos los detalles pesados de sus servicios de vuelta
+    @JsonIgnoreProperties({"tecnico", "cliente", "hibernateLazyInitializer", "handler"})
     private List<Servicio> servicios;
 
     @OneToMany(mappedBy = "tecnico", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("tecnico")
+    @JsonIgnoreProperties({"tecnico", "hibernateLazyInitializer", "handler"})
     private List<Agenda> agenda;
 }

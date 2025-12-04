@@ -35,7 +35,9 @@ public class Cliente {
     @NotBlank(message = "La dirección es obligatoria")
     private String direccion;
 
+    // --- CORRECCIÓN ---
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("cliente")
+    // Cortamos el ciclo: Cliente -> Servicios -> Cliente
+    @JsonIgnoreProperties({"cliente", "tecnico", "hibernateLazyInitializer", "handler"})
     private List<Servicio> servicios;
 }

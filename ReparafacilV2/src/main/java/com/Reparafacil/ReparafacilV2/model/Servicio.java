@@ -20,9 +20,8 @@ public class Servicio {
     @Column(nullable = false)
     private String descripcionProblema;
 
-    private String diagnostico; // Llenado por el técnico
-
-    private String solucion; // Llenado por el técnico
+    private String diagnostico;
+    private String solucion;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -31,23 +30,25 @@ public class Servicio {
     @Column(nullable = false)
     private LocalDateTime fechaSolicitud = LocalDateTime.now();
 
-    // --- Relaciones ---
+    // --- CORRECCIÓN DE RELACIONES ---
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
-    @JsonIgnoreProperties("servicios")
+    // Evita bucle infinito al traer el cliente y errores Lazy
+    @JsonIgnoreProperties({"servicios", "hibernateLazyInitializer", "handler"})
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tecnico_id") // Se puede asignar después
-    @JsonIgnoreProperties("servicios")
+    @JoinColumn(name = "tecnico_id")
+    // Evita bucle con técnico y errores Lazy
+    @JsonIgnoreProperties({"servicios", "agenda", "hibernateLazyInitializer", "handler"})
     private Tecnico tecnico;
 
     @OneToOne(mappedBy = "servicio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("servicio")
+    @JsonIgnoreProperties({"servicio", "hibernateLazyInitializer", "handler"})
     private Garantia garantia;
 
     @OneToOne(mappedBy = "servicio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("servicio")
-    private Agenda agenda; // La cita específica para este servicio
+    @JsonIgnoreProperties({"servicio", "hibernateLazyInitializer", "handler"})
+    private Agenda agenda;
 }
