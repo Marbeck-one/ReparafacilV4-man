@@ -43,6 +43,11 @@ public class GarantiaServiceImpl implements GarantiaService {
         actual.setFechaInicio(garantia.getFechaInicio());
         actual.setFechaFin(garantia.getFechaFin());
         actual.setDetalles(garantia.getDetalles());
+        
+        // --- AGREGAR ESTA LÍNEA ---
+        actual.setEstado(garantia.getEstado()); 
+        // ---------------------------
+        
         return repo.save(actual);
     }
 

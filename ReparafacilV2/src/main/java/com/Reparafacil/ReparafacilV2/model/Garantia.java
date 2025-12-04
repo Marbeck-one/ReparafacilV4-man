@@ -3,7 +3,6 @@ package com.Reparafacil.ReparafacilV2.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Entity
@@ -15,11 +14,9 @@ public class Garantia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación OneToOne con Servicio
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "servicio_id")
-    // IMPORTANTE: Esto evita que al leer la garantía intente leer todo el servicio de nuevo y falle
-    @JsonIgnoreProperties({"garantia", "agenda", "cliente", "tecnico", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"garantia", "agenda", "hibernateLazyInitializer", "handler"}) 
     private Servicio servicio;
 
     @Column(nullable = false)
@@ -29,4 +26,8 @@ public class Garantia {
     private LocalDate fechaFin;
 
     private String detalles;
+
+    // Aquí es donde daba error, ahora funcionará al existir el archivo EstadoGarantia.java
+    @Enumerated(EnumType.STRING)
+    private EstadoGarantia estado = EstadoGarantia.PENDIENTE;
 }
