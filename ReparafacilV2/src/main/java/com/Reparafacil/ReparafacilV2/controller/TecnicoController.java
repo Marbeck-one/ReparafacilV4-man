@@ -38,6 +38,9 @@ public class TecnicoController {
     @ApiResponse(responseCode = "201", description = "Técnico creado")
     @PostMapping
     public ResponseEntity<Tecnico> crear(@Valid @RequestBody Tecnico tecnico) {
+        // CORRECCIÓN: Eliminamos la validación de null porque 'disponible' es primitivo
+        // y ya tiene valor por defecto 'true' en la Entidad.
+        
         Tecnico creado = service.crear(tecnico);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
