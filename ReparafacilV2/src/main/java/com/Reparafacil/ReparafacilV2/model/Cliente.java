@@ -35,9 +35,8 @@ public class Cliente {
     @NotBlank(message = "La dirección es obligatoria")
     private String direccion;
 
-    // --- Relación (CORREGIDA) ---
+    // --- Lista BLINDADA ---
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    // Al pedir un cliente, no traemos de vuelta al cliente dentro de cada servicio
     @JsonIgnoreProperties({"cliente", "tecnico", "hibernateLazyInitializer", "handler"})
     private List<Servicio> servicios;
 }

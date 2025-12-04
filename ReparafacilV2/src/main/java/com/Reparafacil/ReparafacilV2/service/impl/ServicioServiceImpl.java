@@ -34,20 +34,24 @@ public class ServicioServiceImpl implements ServicioService {
 
     @Override
     public Servicio crear(Servicio servicio) {
-        // En un caso real, buscaríamos Cliente y Tecnico por ID y los asignaríamos
-        // aquí para asegurar que existen.
         return repo.save(servicio);
     }
 
     @Override
     public Servicio actualizar(Long id, Servicio servicio) {
         Servicio actual = buscarPorId(id);
+        
+        // Actualizar campos básicos
         actual.setDescripcionProblema(servicio.getDescripcionProblema());
         actual.setDiagnostico(servicio.getDiagnostico());
         actual.setSolucion(servicio.getSolucion());
         actual.setEstado(servicio.getEstado());
-        // No actualizamos relaciones (cliente, tecnico) aquí,
-        // eso sería en endpoints más complejos (ej: /api/servicios/1/asignar/2)
+        
+        // Actualizar relaciones si vienen
+        if (servicio.getTecnico() != null) {
+            actual.setTecnico(servicio.getTecnico());
+        }
+        
         return repo.save(actual);
     }
 

@@ -37,18 +37,16 @@ public class Tecnico {
 
     private boolean disponible = true;
 
-    // Campo para la foto (URL)
     @Column(length = 500)
     private String foto;
 
-    // --- CORRECCIÓN DE LISTAS ---
+    // --- Listas BLINDADAS ---
 
     @OneToMany(mappedBy = "tecnico", cascade = CascadeType.ALL, orphanRemoval = true)
-    // Al pedir un técnico, no traemos todos los detalles pesados de sus servicios de vuelta
     @JsonIgnoreProperties({"tecnico", "cliente", "hibernateLazyInitializer", "handler"})
     private List<Servicio> servicios;
 
     @OneToMany(mappedBy = "tecnico", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"tecnico", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"tecnico", "servicio", "hibernateLazyInitializer", "handler"})
     private List<Agenda> agenda;
 }

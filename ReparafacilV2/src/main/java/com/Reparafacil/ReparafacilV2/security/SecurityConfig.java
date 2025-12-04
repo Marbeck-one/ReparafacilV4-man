@@ -3,7 +3,6 @@ package com.Reparafacil.ReparafacilV2.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -38,16 +37,18 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                // ORDEN CRÍTICO: Rutas públicas PRIMERO
+                // Rutas Públicas
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/doc/**").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/swagger-resources/**").permitAll()
-                .requestMatchers("/webjars/**").permitAll()
+                .requestMatchers("/doc/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                // Todo lo demás requiere autenticación
+                
+                // Rutas Protegidas (AQUÍ ESTABA EL PROBLEMA, FALTABA AGENDAS)
+                .requestMatchers("/api/tecnicos/**").authenticated()
+                .requestMatchers("/api/clientes/**").authenticated()
+                .requestMatchers("/api/servicios/**").authenticated()
+                .requestMatchers("/api/agendas/**").authenticated() // <--- ESTA ES CRÍTICA
+                .requestMatchers("/api/garantias/**").authenticated()
+
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
@@ -67,7 +68,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public org.springframework.security.authentication.AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 

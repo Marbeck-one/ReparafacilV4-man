@@ -20,6 +20,7 @@ public class DataSeeder {
             ClienteRepository clienteRepo,
             ServicioRepository servicioRepo,
             GarantiaRepository garantiaRepo,
+            AgendaRepository agendaRepo, // <--- ¡AQUÍ ESTÁ LA HERRAMIENTA NUEVA!
             PasswordEncoder encoder) {
 
         return args -> {
@@ -47,7 +48,7 @@ public class DataSeeder {
                 System.out.println("--> Usuario TECNICO (Login) creado: tecnico1 / 123456");
             }
 
-            // Crear USUARIO CLIENTE (Login) - NUEVO
+            // Crear USUARIO CLIENTE (Login)
             if (userRepo.findByUsername("cliente1").isEmpty()) {
                 Usuario userCliente = new Usuario();
                 userCliente.setUsername("cliente1");
@@ -88,7 +89,7 @@ public class DataSeeder {
             }
 
             // ==========================================
-            // 3. DATOS DE PRUEBA PARA GARANTÍAS
+            // 3. DATOS DE PRUEBA PARA GARANTÍAS Y SERVICIOS
             // ==========================================
             
             if (clienteRepo.findByEmail("cliente.garantia@test.com").isEmpty()) {
@@ -122,7 +123,48 @@ public class DataSeeder {
                 System.out.println("--> DATOS DE PRUEBA CREADOS:");
                 System.out.println("    Cliente: Mario Bros");
                 System.out.println("    Servicio ID: " + servicio.getId());
-                System.out.println("    Garantía ID (Usar en el buscador): " + garantia.getId()); // Probablemente sea 1
+                System.out.println("    Garantía ID (Usar en el buscador): " + garantia.getId());
+            }
+
+            // ==========================================
+            // 4. DATOS DE PRUEBA PARA AGENDA (NUEVO)
+            // ==========================================
+            
+            // Verificamos si ya existe alguna agenda para no duplicar
+            if (servicioRepo.count() > 0 && tecnicoRepo.count() > 0 && agendaRepo.count() == 0) {
+               // Vamos a crear una Cita de prueba para el técnico "Carlos Pérez"
+               Tecnico tecnico = tecnicoRepo.findByEmail("carlos.perez@reparafacil.com").orElse(null);
+               
+               // Creamos un servicio rápido para agendarlo
+               if (tecnico != null) {
+                   // Buscamos un cliente (Mario o creamos uno)
+                   Cliente cliente = clienteRepo.findAll().stream().findFirst().orElse(null);
+                   
+                   if (cliente != null) {
+                       // 1. Crear Servicio para la cita
+                       Servicio servicioAgenda = new Servicio();
+                       servicioAgenda.setDescripcionProblema("Mantenimiento de Aire Acondicionado");
+                       servicioAgenda.setEstado(EstadoServicio.ASIGNADO);
+                       servicioAgenda.setCliente(cliente);
+                       servicioAgenda.setTecnico(tecnico);
+                       servicioRepo.save(servicioAgenda);
+
+                       // 2. Crear Agenda (La Cita)
+                       Agenda cita = new Agenda();
+                       cita.setServicio(servicioAgenda);
+                       cita.setTecnico(tecnico);
+                       // Cita para mañana a las 10:00 AM
+                       cita.setFechaHoraInicio(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0)); 
+                       // Termina mañana a las 12:00 PM
+                       cita.setFechaHoraFin(LocalDateTime.now().plusDays(1).withHour(12).withMinute(0));    
+                       cita.setEstado(EstadoAgenda.RESERVADO);
+                       
+                       // Guardamos usando la herramienta que pedimos arriba
+                       agendaRepo.save(cita); 
+                       
+                       System.out.println("--> Cita de Agenda creada para: " + tecnico.getNombre());
+                   }
+               }
             }
         };
     }

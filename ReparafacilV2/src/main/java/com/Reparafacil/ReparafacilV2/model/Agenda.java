@@ -15,17 +15,15 @@ public class Agenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación con Servicio
-    @OneToOne(fetch = FetchType.LAZY)
+    // --- CAMBIO CLAVE AQUÍ: cascade = CascadeType.ALL ---
+    // Esto permite crear el Servicio automáticamente al guardar la Agenda
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
     @JoinColumn(name = "servicio_id")
-    // Cortamos el ciclo hacia Servicio
     @JsonIgnoreProperties({"agenda", "garantia", "cliente", "tecnico", "hibernateLazyInitializer", "handler"})
     private Servicio servicio;
 
-    // Relación con Técnico
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tecnico_id")
-    // Cortamos el ciclo hacia Técnico
     @JsonIgnoreProperties({"agenda", "servicios", "hibernateLazyInitializer", "handler"})
     private Tecnico tecnico;
 
