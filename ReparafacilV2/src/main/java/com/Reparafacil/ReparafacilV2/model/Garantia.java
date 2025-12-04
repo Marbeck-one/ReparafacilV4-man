@@ -2,12 +2,17 @@ package com.Reparafacil.ReparafacilV2.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor; // <--- NUEVO
 import lombok.Data;
+import lombok.NoArgsConstructor;  // <--- NUEVO
+
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "garantias")
 @Data
+@NoArgsConstructor  // <--- NECESARIO
+@AllArgsConstructor // <--- NECESARIO
 public class Garantia {
 
     @Id
@@ -27,7 +32,6 @@ public class Garantia {
 
     private String detalles;
 
-    // Aquí es donde daba error, ahora funcionará al existir el archivo EstadoGarantia.java
     @Enumerated(EnumType.STRING)
     private EstadoGarantia estado = EstadoGarantia.PENDIENTE;
 }

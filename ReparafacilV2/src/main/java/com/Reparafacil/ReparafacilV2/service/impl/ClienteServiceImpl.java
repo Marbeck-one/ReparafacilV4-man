@@ -2,11 +2,15 @@ package com.Reparafacil.ReparafacilV2.service.impl;
 
 import com.Reparafacil.ReparafacilV2.exception.NotFoundException;
 import com.Reparafacil.ReparafacilV2.model.Cliente;
+import com.Reparafacil.ReparafacilV2.model.Rol;
+import com.Reparafacil.ReparafacilV2.model.Usuario;
 import com.Reparafacil.ReparafacilV2.repository.ClienteRepository;
+import com.Reparafacil.ReparafacilV2.repository.UsuarioRepository;
 import com.Reparafacil.ReparafacilV2.service.ClienteService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.lang.NonNull;
+
 import java.util.List;
 
 @Service
@@ -14,9 +18,14 @@ import java.util.List;
 public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository repo;
+    private final UsuarioRepository usuarioRepo; // Agregado
+    private final PasswordEncoder passwordEncoder; // Agregado
 
-    public ClienteServiceImpl(ClienteRepository repo) {
+    // Inyección completa
+    public ClienteServiceImpl(ClienteRepository repo, UsuarioRepository usuarioRepo, PasswordEncoder passwordEncoder) {
         this.repo = repo;
+        this.usuarioRepo = usuarioRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -34,7 +43,24 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public Cliente crear(Cliente cliente) {
-        return repo.save(cliente);
+        // 1. Crear perfil cliente
+        Cliente nuevo = repo.save(cliente);
+
+        // 2. Crear usuario de login automáticamente
+        if (usuarioRepo.findByUsername(cliente.getEmail()).isEmpty()) {
+            Usuario u = new Usuario();
+            u.setUsername(cliente.getEmail());
+            
+            // Password del form o default
+            String pass = (cliente.getPassword() != null && !cliente.getPassword().isBlank()) 
+                          ? cliente.getPassword() 
+                          : "123456";
+                          
+            u.setPassword(passwordEncoder.encode(pass));
+            u.setRol(Rol.CLIENTE);
+            usuarioRepo.save(u);
+        }
+        return nuevo;
     }
 
     @Override
@@ -45,7 +71,19 @@ public class ClienteServiceImpl implements ClienteService {
         actual.setEmail(cliente.getEmail()); 
         actual.setTelefono(cliente.getTelefono());
         actual.setDireccion(cliente.getDireccion());
-        return repo.save(actual);
+        
+        repo.save(actual);
+
+        // 3. Actualizar contraseña si se solicita
+        if (cliente.getPassword() != null && !cliente.getPassword().isBlank()) {
+            usuarioRepo.findByUsername(actual.getEmail()).ifPresent(u -> {
+                u.setPassword(passwordEncoder.encode(cliente.getPassword()));
+                usuarioRepo.save(u);
+                System.out.println("--> Contraseña actualizada para cliente: " + actual.getEmail());
+            });
+        }
+
+        return actual;
     }
 
     @Override

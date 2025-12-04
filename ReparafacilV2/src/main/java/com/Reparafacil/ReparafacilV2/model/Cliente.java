@@ -3,13 +3,17 @@ package com.Reparafacil.ReparafacilV2.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor; // <--- NUEVO
 import lombok.Data;
+import lombok.NoArgsConstructor;  // <--- NUEVO
 
 import java.util.List;
 
 @Entity
 @Table(name = "clientes")
 @Data
+@NoArgsConstructor  // <--- NECESARIO PARA QUE JACKSON LEA EL JSON
+@AllArgsConstructor // <--- BUENA PRÁCTICA
 public class Cliente {
 
     @Id
@@ -34,6 +38,9 @@ public class Cliente {
 
     @NotBlank(message = "La dirección es obligatoria")
     private String direccion;
+
+    @Transient
+    private String password;
 
     // --- Lista BLINDADA ---
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)

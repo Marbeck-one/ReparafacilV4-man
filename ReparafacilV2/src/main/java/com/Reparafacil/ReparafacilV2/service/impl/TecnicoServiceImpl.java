@@ -18,10 +18,9 @@ import java.util.List;
 public class TecnicoServiceImpl implements TecnicoService {
 
     private final TecnicoRepository repo;
-    private final UsuarioRepository usuarioRepo; // Necesario para crear el usuario de login
-    private final PasswordEncoder passwordEncoder; // Necesario para encriptar la contraseña
+    private final UsuarioRepository usuarioRepo;
+    private final PasswordEncoder passwordEncoder;
 
-    // Inyección de dependencias en el constructor
     public TecnicoServiceImpl(TecnicoRepository repo, UsuarioRepository usuarioRepo, PasswordEncoder passwordEncoder) {
         this.repo = repo;
         this.usuarioRepo = usuarioRepo;
@@ -43,19 +42,23 @@ public class TecnicoServiceImpl implements TecnicoService {
 
     @Override
     public Tecnico crear(Tecnico tecnico) {
-        // 1. Guardamos los datos del técnico (Perfil)
+        // 1. Guardar el perfil
         Tecnico nuevoTecnico = repo.save(tecnico);
 
-        // 2. Creamos AUTOMÁTICAMENTE el usuario de acceso (Login)
-        // Usamos el email como usuario y "123456" como contraseña por defecto
+        // 2. Crear Login si no existe
         if (usuarioRepo.findByUsername(tecnico.getEmail()).isEmpty()) {
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setUsername(tecnico.getEmail());
-            nuevoUsuario.setPassword(passwordEncoder.encode("123456")); 
+            
+            // Usar password del form o default "123456"
+            String pass = (tecnico.getPassword() != null && !tecnico.getPassword().isBlank()) 
+                          ? tecnico.getPassword() 
+                          : "123456";
+                          
+            nuevoUsuario.setPassword(passwordEncoder.encode(pass)); 
             nuevoUsuario.setRol(Rol.TECNICO);
             
             usuarioRepo.save(nuevoUsuario);
-            System.out.println("--> LOGIN CREADO para: " + tecnico.getEmail() + " / Pass: 123456");
         }
 
         return nuevoTecnico;
@@ -64,24 +67,42 @@ public class TecnicoServiceImpl implements TecnicoService {
     @Override
     public Tecnico actualizar(Long id, Tecnico tecnico) {
         Tecnico actual = buscarPorId(id);
+        
+        // Actualizar datos básicos
         actual.setNombre(tecnico.getNombre());
         actual.setApellido(tecnico.getApellido());
+        
+        // Si cambia el email, habría que actualizar el username del usuario también (lógica compleja omitida por seguridad básica)
+        // Por ahora asumimos que el email se actualiza aquí:
         actual.setEmail(tecnico.getEmail());
+        
         actual.setTelefono(tecnico.getTelefono());
         actual.setEspecialidad(tecnico.getEspecialidad());
         actual.setDisponible(tecnico.isDisponible());
         
-        // Actualizamos foto si viene
         if (tecnico.getFoto() != null) {
              actual.setFoto(tecnico.getFoto());
         }
 
-        return repo.save(actual);
+        repo.save(actual);
+
+        // 3. Actualizar contraseña si viene en el JSON
+        if (tecnico.getPassword() != null && !tecnico.getPassword().isBlank()) {
+            usuarioRepo.findByUsername(actual.getEmail()).ifPresent(usuario -> {
+                usuario.setPassword(passwordEncoder.encode(tecnico.getPassword()));
+                usuarioRepo.save(usuario);
+                System.out.println("--> Contraseña actualizada para técnico: " + actual.getEmail());
+            });
+        }
+
+        return actual;
     }
 
     @Override
     public void eliminar(Long id) {
         Tecnico actual = buscarPorId(id);
+        // Opcional: Eliminar también el usuario asociado si se desea
+        // usuarioRepo.findByUsername(actual.getEmail()).ifPresent(usuarioRepo::delete);
         repo.delete(actual);
     }
 }

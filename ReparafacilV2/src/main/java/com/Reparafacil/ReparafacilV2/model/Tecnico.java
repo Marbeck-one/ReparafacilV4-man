@@ -3,13 +3,17 @@ package com.Reparafacil.ReparafacilV2.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor; // <--- NUEVO
 import lombok.Data;
+import lombok.NoArgsConstructor;  // <--- NUEVO
 
 import java.util.List;
 
 @Entity
 @Table(name = "tecnicos")
 @Data
+@NoArgsConstructor  // <--- NECESARIO
+@AllArgsConstructor // <--- NECESARIO
 public class Tecnico {
 
     @Id
@@ -39,6 +43,9 @@ public class Tecnico {
 
     @Column(length = 500)
     private String foto;
+
+    @Transient
+    private String password;
 
     // --- Listas BLINDADAS ---
 
