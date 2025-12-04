@@ -15,11 +15,12 @@ public class Agenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- CAMBIO CLAVE AQUÍ: cascade = CascadeType.ALL ---
-    // Esto permite crear el Servicio automáticamente al guardar la Agenda
+    // --- CORRECCIÓN IMPORTANTE ---
+    // Quitamos "cliente" y "tecnico" del JsonIgnoreProperties.
+    // Esto permite que cuando envíes el JSON, el backend lea a quién pertenece el servicio.
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
     @JoinColumn(name = "servicio_id")
-    @JsonIgnoreProperties({"agenda", "garantia", "cliente", "tecnico", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"agenda", "garantia", "hibernateLazyInitializer", "handler"}) 
     private Servicio servicio;
 
     @ManyToOne(fetch = FetchType.LAZY)
