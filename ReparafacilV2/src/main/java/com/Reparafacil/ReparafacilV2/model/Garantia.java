@@ -2,7 +2,6 @@ package com.Reparafacil.ReparafacilV2.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -16,20 +15,18 @@ public class Garantia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "La fecha de inicio es obligatoria")
+    // Relación OneToOne con Servicio
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "servicio_id")
+    // IMPORTANTE: Esto evita que al leer la garantía intente leer todo el servicio de nuevo y falle
+    @JsonIgnoreProperties({"garantia", "agenda", "cliente", "tecnico", "hibernateLazyInitializer", "handler"})
+    private Servicio servicio;
+
+    @Column(nullable = false)
     private LocalDate fechaInicio;
 
-    @NotNull(message = "La fecha de fin es obligatoria")
+    @Column(nullable = false)
     private LocalDate fechaFin;
 
-    @NotBlank(message = "Los detalles de la garantía son obligatorios")
-    @Column(columnDefinition = "TEXT")
     private String detalles;
-
-    // --- Relaciones ---
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "servicio_id", referencedColumnName = "id")
-    @JsonIgnoreProperties("garantia")
-    private Servicio servicio;
 }

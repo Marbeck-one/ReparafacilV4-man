@@ -20,8 +20,9 @@ public class Servicio {
     @Column(nullable = false)
     private String descripcionProblema;
 
-    private String diagnostico;
-    private String solucion;
+    private String diagnostico; // Llenado por el técnico
+
+    private String solucion; // Llenado por el técnico
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -30,17 +31,17 @@ public class Servicio {
     @Column(nullable = false)
     private LocalDateTime fechaSolicitud = LocalDateTime.now();
 
-    // --- CORRECCIÓN DE RELACIONES ---
+    // --- Relaciones (CORREGIDAS) ---
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
-    // Evita bucle infinito al traer el cliente y errores Lazy
+    // Cortamos el bucle hacia 'servicios' del cliente y evitamos error de carga Lazy
     @JsonIgnoreProperties({"servicios", "hibernateLazyInitializer", "handler"})
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tecnico_id")
-    // Evita bucle con técnico y errores Lazy
+    // Cortamos el bucle hacia 'servicios' y 'agenda' del técnico
     @JsonIgnoreProperties({"servicios", "agenda", "hibernateLazyInitializer", "handler"})
     private Tecnico tecnico;
 

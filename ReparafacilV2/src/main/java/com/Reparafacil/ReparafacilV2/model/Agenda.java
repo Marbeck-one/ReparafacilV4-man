@@ -2,7 +2,6 @@ package com.Reparafacil.ReparafacilV2.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,25 +15,27 @@ public class Agenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "La fecha/hora de inicio es obligatoria")
+    // Relación con Servicio
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "servicio_id")
+    // Cortamos el ciclo hacia Servicio
+    @JsonIgnoreProperties({"agenda", "garantia", "cliente", "tecnico", "hibernateLazyInitializer", "handler"})
+    private Servicio servicio;
+
+    // Relación con Técnico
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tecnico_id")
+    // Cortamos el ciclo hacia Técnico
+    @JsonIgnoreProperties({"agenda", "servicios", "hibernateLazyInitializer", "handler"})
+    private Tecnico tecnico;
+
+    @Column(nullable = false)
     private LocalDateTime fechaHoraInicio;
 
-    @NotNull(message = "La fecha/hora de fin es obligatoria")
+    @Column(nullable = false)
     private LocalDateTime fechaHoraFin;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoAgenda estado = EstadoAgenda.DISPONIBLE;
-
-    // --- Relaciones ---
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tecnico_id")
-    @JsonIgnoreProperties("agenda")
-    private Tecnico tecnico;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "servicio_id", referencedColumnName = "id")
-    @JsonIgnoreProperties("agenda")
-    private Servicio servicio; // El servicio que reserva este slot
+    private EstadoAgenda estado = EstadoAgenda.PENDIENTE;
 }
